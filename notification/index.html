@@ -15,6 +15,40 @@
 
 </body>
 <script>
+    const applicationServerPublicKey = "BKHhlP2eWKSL_EPHzwftHJ0hwaA3yZb2y2Fa8Y4AKedk4UWQY8xKNQuGDuFeCZ9AHldL9yz6979uYqjv6V3tuIg";
+
+    const domShow = document.querySelector('#labelShow');
+
+    const alertEx = function (title, msg, url) {
+        var $content = "<div class='dialog-ovelay'>" +
+            "<div class='dialog'><header>" +
+            " <h3> " + title + " </h3> " +
+            "<i class='fa fa-close'></i>" +
+            "</header>" +
+            "<div class='dialog-msg'>" +
+            " <p> " + msg + " </p> " +
+            "</div>" +
+            "<footer>" +
+            "<div class='controls'>" +
+            " <button class='button button-danger doAction'>確認</button> " +
+            " <button class='button button-danger goAction'>詳細</button> " +
+            "</div>" +
+            "</footer>" +
+            "</div>" +
+            "</div>";
+        var dom = document.createElement('div');
+        dom.innerHTML = $content;
+        document.querySelector('body').prepend(dom);
+        document.querySelector('.doAction').addEventListener('click', function () {
+            dom.remove();
+
+        });
+        document.querySelector('.goAction').addEventListener('click', function () {
+            location.href = url;
+
+        });
+    }
+
 
     var firebaseConfig = {
         apiKey: "AIzaSyABhV2J8lQhxZEp-08jcq88-NS8yhn7TVg",
@@ -29,53 +63,31 @@
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
     const messaging = firebase.messaging();
-    
+    messaging.usePublicVapidKey(applicationServerPublicKey);
+
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('firebase-message-sw.js')
-            .then(reg => {
-                console.log(0,reg);
-                subscribeUser(reg);
-                messaging.useServiceWorker(reg);
+
+        navigator.serviceWorker.register("firebase-messaging-sw.js")
+            .then(registration => {
+                subscribeUser( registration );
+                messaging.useServiceWorker(registration);
                 messaging.requestPermission()
                     .then(async () => {
                         token = await messaging.getToken();
-                        console.log(1,token);
-                        fetch(`https://script.google.com/macros/s/AKfycby7N3C0WlftD4TbmjeYo62SZhDGayShgPm0_Nch7dRLDnFqISeJv_ca2mAVwkoC7Y_0/exec?type=write&&value=${token}`);
-                        console.log(3);
+                        
+                        console.log(token);
                         console.log('允許通知');
                     })
                     .catch(() => {
                         console.log('unable to get permission to notify');
                     })
-            }).catch(error => {
-                // registration failed
-                console.log('[Service Worker] Registration failed with ' + error);
-            });
-        navigator.serviceWorker.addEventListener('message', event => {
-            // event is a MessageEvent object
-            console.log(event);
-        });
 
-        navigator.serviceWorker.ready.then(registration => {
-            registration.active.postMessage("Hi service worker");
-        });
+            }).catch(err => {
+                console.log('fail', err);
+            })
+    } else {
+        console.log('不支援sw');
     }
-
-
-    function displayNotification() {
-        if (Notification.permission == 'granted') {
-            navigator.serviceWorker.getRegistration().then(reg => {
-                var options = {
-                    icon: 'https://www.winmate.com/images/winmate-logo-Winmate-HQ.svg',
-                    body: 'xHealthcare Rugged Handheld Computers ',
-                    image: 'https://www.winmate.com/upload/Banner/Banner-banner_product_Healthcare-Winmate-HQ-Global-EN-B-P.png'
-                };
-                reg.showNotification('xWellcome Winmate WebSide', options);
-                console.log('displayNotification');
-            });
-        }
-    }
-
 </script>
 
 </html>
