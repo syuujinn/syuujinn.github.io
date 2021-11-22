@@ -31,7 +31,7 @@
     const messaging = firebase.messaging();
     
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('firebase-message-sw.js')
+        navigator.serviceWorker.register('/firebase-message-sw.js')
             .then(reg => {
                 console.log(reg);
                 subscribeUser(reg);
