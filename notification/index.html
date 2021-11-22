@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+</head>
+
+<body>
+
+</body>
+<script>
+
+    var firebaseConfig = {
+        apiKey: "AIzaSyABhV2J8lQhxZEp-08jcq88-NS8yhn7TVg",
+        authDomain: "spush-8fdb0.firebaseapp.com",
+        projectId: "spush-8fdb0",
+        storageBucket: "spush-8fdb0.appspot.com",
+        messagingSenderId: "720461377636",
+        appId: "1:720461377636:web:806f4da0d6c3fe2771af71",
+        measurementId: "G-RLP9CXLFLG"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    const messaging = firebase.messaging();
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('firebase-message-sw.js')
+            .then(reg => {
+                console.log(reg);
+                subscribeUser(reg);
+                messaging.useServiceWorker(reg);
+                messaging.requestPermission()
+                    .then(async () => {
+                        token = await messaging.getToken();
+
+                        console.log(token);
+                        console.log('允許通知');
+                    })
+                    .catch(() => {
+                        console.log('unable to get permission to notify');
+                    })
+            }).catch(error => {
+                // registration failed
+                console.log('[Service Worker] Registration failed with ' + error);
+            });
+        navigator.serviceWorker.addEventListener('message', event => {
+            // event is a MessageEvent object
+            console.log(event);
+        });
+
+        navigator.serviceWorker.ready.then(registration => {
+            registration.active.postMessage("Hi service worker");
+        });
+    }
+
+
+    function displayNotification() {
+        if (Notification.permission == 'granted') {
+            navigator.serviceWorker.getRegistration().then(reg => {
+                var options = {
+                    icon: 'https://www.winmate.com/images/winmate-logo-Winmate-HQ.svg',
+                    body: 'xHealthcare Rugged Handheld Computers ',
+                    image: 'https://www.winmate.com/upload/Banner/Banner-banner_product_Healthcare-Winmate-HQ-Global-EN-B-P.png'
+                };
+                reg.showNotification('xWellcome Winmate WebSide', options);
+                console.log('displayNotification');
+            });
+        }
+    }
+
+</script>
+
+</html>
