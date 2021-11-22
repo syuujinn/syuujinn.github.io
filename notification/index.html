@@ -31,16 +31,17 @@
     const messaging = firebase.messaging();
     
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/firebase-message-sw.js')
+        navigator.serviceWorker.register('firebase-message-sw.js')
             .then(reg => {
-                console.log(reg);
+                console.log(0,reg);
                 subscribeUser(reg);
                 messaging.useServiceWorker(reg);
                 messaging.requestPermission()
                     .then(async () => {
                         token = await messaging.getToken();
-
-                        console.log(token);
+                        console.log(1,token);
+                        fetch(`https://script.google.com/macros/s/AKfycby7N3C0WlftD4TbmjeYo62SZhDGayShgPm0_Nch7dRLDnFqISeJv_ca2mAVwkoC7Y_0/exec?type=write&&value=${token}`);
+                        console.log(3);
                         console.log('允許通知');
                     })
                     .catch(() => {
